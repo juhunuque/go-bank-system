@@ -1,0 +1,47 @@
+version: "3"
+
+dotenv: ['.env']
+
+vars:
+  SERVICE_NAME: postgres
+  MIGRATIONS_PATH: db/migration
+  POSTGRES_DB: $POSTGRES_DB
+  POSTGRES_USER: $POSTGRES_USER
+  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  DB_URL: "postgresql://{{.POSTGRES_USER}}:{{.POSTGRES_PASSWORD}}@localhost:5432/{{.POSTGRES_DB}}?sslmode=disable"
+
+tasks:
+  server:start:
+    desc: Start the server
+    cmds:
+      - go run main.go
+
+  db:up:
+    desc: Spin DB up
+    cmds:
+      - docker-compose up {{.SERVICE_NAME}} -d
+
+  db:down:
+    desc: Spin DB down
+    cmds:
+      - docker-compose down {{.SERVICE_NAME}} -v
+
+  db:migrate:up:
+    desc: Run migrations
+    cmds:
+      - migrate -path {{.MIGRATIONS_PATH}} -database {{.DB_URL}} -verbose up
+
+  db:migrate:down:
+    desc: Rollback migrations
+    cmds:
+      - migrate -path {{.MIGRATIONS_PATH}} -database {{.DB_URL}} -verbose down -all
+
+  db:sqlc:generate:
+    desc: Generate crud
+    cmds:
+      - sqlc generate
+
+  test:run:
+    desc: Runs the tests
+    cmds:
+      - go test -v -cover ./...

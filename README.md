@@ -11,6 +11,8 @@
 ## Tasks
 - List  menu: `task --list`
 
+## Mock
+`mockgen -package mockdb -destination db/mock/store.go github.com/juhunuque/simplebank/db/sqlc Store`
 
 ## Resources
 - https://github.com/techschool/simplebank
@@ -21,6 +23,8 @@
 - Data layer: https://github.com/kyleconroy/sqlc
 - PG Driver lib: https://github.com/lib/pq (db/sql is a generic implementations and requires this lib to interact with PG)
 - Assertion for tests: https://github.com/stretchr/testify
+- Load config from env: https://github.com/spf13/viper
+- Mock DB: https://github.com/golang/mock
 
 ## Appendix
 

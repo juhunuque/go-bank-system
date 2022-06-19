@@ -41,6 +41,11 @@ tasks:
     cmds:
       - sqlc generate
 
+  db:mock:
+    desc: Generate mock structure
+    cmds:
+      - mockgen -package mockdb -destination db/mock/store.go github.com/juhunuque/simplebank/db/sqlc Store
+
   test:run:
     desc: Runs the tests
     cmds:

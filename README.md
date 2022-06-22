@@ -25,6 +25,9 @@
 - Assertion for tests: https://github.com/stretchr/testify
 - Load config from env: https://github.com/spf13/viper
 - Mock DB: https://github.com/golang/mock
+- Manage UUID: https://github.com/google/uuid
+- Handle JWT: https://github.com/dgrijalva/jwt-go
+- Handle PASETO: https://github.com/o1egl/paseto
 
 ## Appendix
 

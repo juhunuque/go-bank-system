@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	db "github.com/juhunuque/simplebank/db/sqlc"
+	"github.com/juhunuque/simplebank/token"
 	"github.com/lib/pq"
 	"net/http"
 )
 
 type createAccountRequest struct {
-	Owner    string `json:"owner" binding:"required"`
 	Currency string `json:"currency" binding:"required,currency"`
 }
 
@@ -20,8 +20,10 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		return
 	}
 
+	// Casting the incoming payload
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.CreateAccountParams{
-		Owner:    req.Owner,
+		Owner:    authPayload.Username,
 		Balance:  0,
 		Currency: req.Currency,
 	}
@@ -63,6 +65,13 @@ func (server *Server) getAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if account.Owner != authPayload.Username {
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
 	ctx.JSON(http.StatusOK, account)
 }
 
@@ -78,9 +87,11 @@ func (server *Server) listAccount(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.ListAccountsParams{
+		Owner:  authPayload.Username,
 		Limit:  req.PageSize,
-		Offset: req.PageID,
+		Offset: (req.PageID - 1) * req.PageSize,
 	}
 
 	accounts, err := server.store.ListAccounts(ctx, arg)
@@ -88,6 +99,7 @@ func (server *Server) listAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
 	ctx.JSON(http.StatusOK, accounts)
 }
 
